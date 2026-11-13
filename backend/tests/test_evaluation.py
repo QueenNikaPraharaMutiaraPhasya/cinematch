@@ -14,9 +14,11 @@ from backend.app.services.evaluation import (
     evaluate_rankings,
     hit_at_k,
     mean_se,
+    ndcg_at_k,
     popularity_ranking,
     rank_nb,
     recall_at_k,
+    reciprocal_rank_at_k,
     relevant_sets,
     split_validation,
     subset,
@@ -245,3 +247,80 @@ def test_real_relevant_sets_nonempty():
     for split in ("train", "test"):
         d = load_data(split, PROCESSED, EMB)
         assert all(len(s) >= 1 for s in relevant_sets(d))
+
+
+# ---------- metrik ranking tambahan kelompok (bukan metrik asli paper) ----------
+
+@pytest.mark.parametrize("ranked,relevant,k,expected", [
+    (["a", "x", "b"], {"a", "b"}, 3, 1.5 / (1 + 1 / math.log2(3))),
+    (["a", "b", "x"], {"a", "b"}, 3, 1.0),
+    (["a", "b"], {"a", "b", "c"}, 2, 1.0),
+    (["a"], {"a", "b"}, 5, 1 / (1 + 1 / math.log2(3))),
+    (["x", "a"], {"a"}, 2, 1 / math.log2(3)),
+    (["x", "a"], {"a"}, 1, 0.0),
+    (["x"], {"a"}, 3, 0.0),
+    ([], {"a"}, 3, 0.0),
+    (["a", "a", "b"], {"a", "b"}, 3, 1.5 / (1 + 1 / math.log2(3))),
+    (["a", "a", "b"], {"a", "b"}, 2, 1 / (1 + 1 / math.log2(3))),
+    (["x", "x", "a"], {"a"}, 3, 0.5),
+])
+def test_ndcg_binary_by_hand(ranked, relevant, k, expected):
+    assert ndcg_at_k(ranked, relevant, k) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("ranked,relevant,k,expected", [
+    (["a", "x", "b"], {"a", "b"}, 3, 1.0),
+    (["x", "b", "a"], {"a", "b"}, 3, 0.5),
+    (["x", "x", "a"], {"a"}, 3, 1 / 3),
+    (["x", "x", "a"], {"a"}, 2, 0.0),
+    (["a", "a", "b"], {"a", "b"}, 3, 1.0),
+    (["a"], {"a", "b"}, 20, 1.0),
+    (["x"], {"a"}, 3, 0.0),
+    ([], {"a"}, 3, 0.0),
+])
+def test_reciprocal_rank_by_hand(ranked, relevant, k, expected):
+    assert reciprocal_rank_at_k(ranked, relevant, k) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("metric", [ndcg_at_k, reciprocal_rank_at_k])
+@pytest.mark.parametrize("k", [0, -1])
+def test_ranking_metrics_invalid_k(metric, k):
+    with pytest.raises(ValueError):
+        metric(["a"], {"a"}, k)
+
+
+@pytest.mark.parametrize("metric", [ndcg_at_k, reciprocal_rank_at_k])
+def test_ranking_metrics_empty_ground_truth(metric):
+    with pytest.raises(ValueError):
+        metric(["a"], set(), 1)
+
+
+def test_ranking_aggregation_preserves_old_metrics():
+    # Query 1: NDCG=1, RR=1; query 2: NDCG=0.5, RR=1/3.
+    rankings = [["a", "b", "x"], ["x", "y", "c"]]
+    relevants = [{"a", "b"}, {"c"}]
+    res = evaluate_rankings(rankings, relevants, ks=(1, 3))
+    assert res["n_queries"] == 2
+    assert res["ndcg"][3] == pytest.approx((0.75, 0.25))
+    assert res["mrr"][3] == pytest.approx((2 / 3, 1 / 3))
+    assert res["ndcg"][1] == pytest.approx((0.5, 0.5))
+    assert res["mrr"][1] == pytest.approx((0.5, 0.5))
+    assert res["recall"][1] == pytest.approx((0.25, 0.25))
+    assert res["hit"][1] == pytest.approx((0.5, 0.5))
+    assert res["ceiling"][1] == pytest.approx((0.75, 0.25))
+    for metric in ("recall", "hit", "ceiling"):
+        assert res[metric][3] == pytest.approx((1.0, 0.0))
+
+
+def test_nb_and_popularity_ranking_metrics_integration(data):
+    queries = np.array([unit(0), unit(90)], dtype=np.float32)
+    relevants = [{"m1", "m2"}, {"m5"}]
+    nb = evaluate_rankings(rank_nb(queries, data, k=1), relevants, ks=(1, 5))
+    pop = evaluate_rankings([popularity_ranking(data)] * 2, relevants, ks=(1, 5))
+    for metric in ("ndcg", "mrr"):
+        assert nb[metric][5] == pytest.approx((1.0, 0.0))
+        assert pop[metric][1] == pytest.approx((0.5, 0.5))
+    # Popularitas = m2, m1, m3, m4, m5; query kedua mendapat posisi 5.
+    assert pop["ndcg"][5] == pytest.approx(((1 + 1 / math.log2(6)) / 2,
+                                             (1 - 1 / math.log2(6)) / 2))
+    assert pop["mrr"][5] == pytest.approx((0.6, 0.4))
