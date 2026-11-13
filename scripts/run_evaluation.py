@@ -2,7 +2,7 @@
 # Tujuan: menjalankan evaluasi sesuai docs/evaluation_protocol.md (K12-K19).
 #   Tahap 1: memilih k pada validasi (dialog train 80/20, seed 42).
 #   Tahap 2: mengevaluasi test SATU kali dengan k terpilih.
-# Hasil: docs/evaluation_report.txt dan docs/evaluation_results.csv
+# Hasil baru: docs/evaluation_report_ranking.txt dan docs/evaluation_results_ranking.csv
 
 import platform
 import sys
@@ -27,8 +27,8 @@ from backend.app.services.evaluation import (
 )
 from backend.app.services.nb import load_data
 
-REPORT_PATH = Path("docs/evaluation_report.txt")
-CSV_PATH = Path("docs/evaluation_results.csv")
+REPORT_PATH = Path("docs/evaluation_report_ranking.txt")
+CSV_PATH = Path("docs/evaluation_results_ranking.csv")
 lines, records = [], []
 
 
@@ -54,8 +54,17 @@ def table(rows):
         log(f"{name:<30}" + "".join(f"{c:>15}" for c in cells))
 
 
+def ranking_table(rows):
+    """Tabel tambahan; tabel metrik lama dan plafon tetap terpisah."""
+    cols = [f"{name}@{K}" for name in ("NDCG", "MRR") for K in KS]
+    log(f"{'Model':<30}" + "".join(f"{c:>15}" for c in cols))
+    for name, res in rows:
+        cells = [pct(res, metric, K) for metric in ("ndcg", "mrr") for K in KS]
+        log(f"{name:<30}" + "".join(f"{c:>15}" for c in cells))
+
+
 def add_records(split, model, k_nb, res):
-    for metric in ("recall", "hit", "ceiling"):
+    for metric in ("recall", "hit", "ceiling", "ndcg", "mrr"):
         for K in KS:
             mean, se = res[metric][K]
             records.append(
@@ -74,6 +83,8 @@ def add_records(split, model, k_nb, res):
 
 log("EVALUASI CINEMATCH (prototype implementasi konsep NBCRS; bukan replikasi paper)")
 log("Protokol: docs/evaluation_protocol.md (K12-K19)")
+log("NDCG dan MRR adalah metrik tambahan kelompok, bukan metrik asli paper NBCRS.")
+log("Evaluasi tambahan setelah hasil test lama diketahui; tuning tetap hanya Recall@20 validasi.")
 log(
     f"Python {platform.python_version()} | numpy {version('numpy')} | pandas {version('pandas')}"
     f" | torch {version('torch')} | sentence-transformers {version('sentence-transformers')}"
@@ -108,6 +119,9 @@ add_records("validation", "Popularitas", None, pop_val)
 rows = [(f"NB zero-shot k={k}", model_cells(res)) for k, res in grid_results]
 rows.append(("Popularitas (datastore 80%)", model_cells(pop_val)))
 table(rows)
+log("\nMetrik ranking tambahan (validasi):")
+ranking_table([(f"NB zero-shot k={k}", res) for k, res in grid_results]
+              + [("Popularitas (datastore 80%)", pop_val)])
 log("Satuan: persen; format rata-rata +- standard error. Query validasi:", len(val_rel))
 log("Panjang daftar rata-rata per k:", {k: round(v, 1) for k, v in avg_len.items()})
 
@@ -132,6 +146,9 @@ table(
     ]
 )
 log("Satuan: persen; format rata-rata +- standard error. Query test:", len(test_rel))
+log("\nMetrik ranking tambahan (test):")
+ranking_table([(f"NB zero-shot k={best_k}", nb_test), ("Popularitas", pop_test)])
+log("Satuan NDCG dan MRR: persen; format rata-rata +- standard error.")
 
 # ---------------- Diagnostik (bukan metrik protokol) ----------------
 log("\n=== DIAGNOSTIK (bukan metrik protokol) ===")

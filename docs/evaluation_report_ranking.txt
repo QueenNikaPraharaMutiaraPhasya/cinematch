@@ -1,0 +1,64 @@
+EVALUASI CINEMATCH (prototype implementasi konsep NBCRS; bukan replikasi paper)
+Protokol: docs/evaluation_protocol.md (K12-K19)
+NDCG dan MRR adalah metrik tambahan kelompok, bukan metrik asli paper NBCRS.
+Evaluasi tambahan setelah hasil test lama diketahui; tuning tetap hanya Recall@20 validasi.
+Python 3.14.6 | numpy 2.5.4 | pandas 3.0.3 | torch 2.14.1+cpu | sentence-transformers 6.2.0
+Embedding: all-MiniLM-L6-v2 | seed 42 | panjang daftar N = 20 | grid k = (1, 5, 10, 30, 60, 90, 120, 150)
+Train: 9566 dialog -> datastore sementara 7653, query validasi 1913
+Test: 1229 dialog (query), datastore akhir = 9566 dialog train
+
+=== TAHAP 1: PEMILIHAN k PADA VALIDASI (K17) ===
+Model                                Recall@1       Recall@5      Recall@20          Hit@1          Hit@5         Hit@20
+NB zero-shot k=1                 1.28 +- 0.16   4.93 +- 0.32   5.04 +- 0.32   3.97 +- 0.45  13.80 +- 0.79  14.11 +- 0.80
+NB zero-shot k=5                 2.57 +- 0.22   7.49 +- 0.37  15.93 +- 0.54   7.84 +- 0.61  21.22 +- 0.94  39.31 +- 1.12
+NB zero-shot k=10                3.02 +- 0.24   9.00 +- 0.41  18.70 +- 0.58   9.41 +- 0.67  25.14 +- 0.99  44.07 +- 1.14
+NB zero-shot k=30                3.74 +- 0.25  11.15 +- 0.45  23.78 +- 0.64  12.23 +- 0.75  30.27 +- 1.05  52.27 +- 1.14
+NB zero-shot k=60                3.34 +- 0.23  11.54 +- 0.45  25.46 +- 0.66  11.19 +- 0.72  31.42 +- 1.06  54.42 +- 1.14
+NB zero-shot k=90                3.37 +- 0.23  11.38 +- 0.45  26.28 +- 0.68  11.24 +- 0.72  31.10 +- 1.06  55.57 +- 1.14
+NB zero-shot k=120               3.32 +- 0.24  11.11 +- 0.44  26.20 +- 0.67  10.87 +- 0.71  30.89 +- 1.06  55.41 +- 1.14
+NB zero-shot k=150               3.12 +- 0.23  11.26 +- 0.45  25.93 +- 0.67  10.30 +- 0.70  30.68 +- 1.05  54.94 +- 1.14
+Popularitas (datastore 80%)      1.19 +- 0.15   4.41 +- 0.28  10.49 +- 0.46   3.82 +- 0.44  13.43 +- 0.78  27.23 +- 1.02
+
+Metrik ranking tambahan (validasi):
+Model                                  NDCG@1         NDCG@5        NDCG@20          MRR@1          MRR@5         MRR@20
+NB zero-shot k=1                 3.97 +- 0.45   4.62 +- 0.30   4.64 +- 0.30   3.97 +- 0.45   7.71 +- 0.51   7.76 +- 0.51
+NB zero-shot k=5                 7.84 +- 0.61   7.18 +- 0.37  10.69 +- 0.40   7.84 +- 0.61  12.42 +- 0.65  14.25 +- 0.64
+NB zero-shot k=10                9.41 +- 0.67   8.78 +- 0.40  12.67 +- 0.44   9.41 +- 0.67  15.07 +- 0.70  16.89 +- 0.69
+NB zero-shot k=30               12.23 +- 0.75  10.81 +- 0.44  15.99 +- 0.48  12.23 +- 0.75  18.55 +- 0.77  20.81 +- 0.75
+NB zero-shot k=60               11.19 +- 0.72  11.00 +- 0.44  16.67 +- 0.48  11.19 +- 0.72  18.43 +- 0.75  20.80 +- 0.72
+NB zero-shot k=90               11.24 +- 0.72  10.83 +- 0.44  16.92 +- 0.49  11.24 +- 0.72  18.21 +- 0.75  20.74 +- 0.72
+NB zero-shot k=120              10.87 +- 0.71  10.67 +- 0.43  16.82 +- 0.48  10.87 +- 0.71  18.01 +- 0.74  20.56 +- 0.72
+NB zero-shot k=150              10.30 +- 0.70  10.60 +- 0.43  16.59 +- 0.48  10.30 +- 0.70  17.54 +- 0.73  20.08 +- 0.70
+Popularitas (datastore 80%)      3.82 +- 0.44   4.10 +- 0.26   6.52 +- 0.31   3.82 +- 0.44   7.31 +- 0.50   8.64 +- 0.49
+Satuan: persen; format rata-rata +- standard error. Query validasi: 1913
+Panjang daftar rata-rata per k: {1: 3.6, 5: 16.4, 10: 20.0, 30: 20.0, 60: 20.0, 90: 20.0, 120: 20.0, 150: 20.0}
+
+k terpilih (Recall@20 validasi tertinggi; seri: k lebih kecil): k = 90
+
+=== TAHAP 2: EVALUASI AKHIR PADA TEST (K18), k = 90 ===
+Model                                Recall@1       Recall@5      Recall@20          Hit@1          Hit@5         Hit@20
+NB zero-shot k=90                2.40 +- 0.28   8.64 +- 0.52  19.35 +- 0.77   7.40 +- 0.75  22.86 +- 1.20  42.72 +- 1.41
+Popularitas                      1.35 +- 0.21   3.93 +- 0.35   9.23 +- 0.54   4.15 +- 0.57  11.55 +- 0.91  24.33 +- 1.22
+Plafon (K14)                    36.64 +- 0.54  99.10 +- 0.13 100.00 +- 0.00              -              -              -
+Satuan: persen; format rata-rata +- standard error. Query test: 1229
+
+Metrik ranking tambahan (test):
+Model                                  NDCG@1         NDCG@5        NDCG@20          MRR@1          MRR@5         MRR@20
+NB zero-shot k=90                7.40 +- 0.75   7.82 +- 0.47  12.01 +- 0.53   7.40 +- 0.75  12.78 +- 0.80  14.72 +- 0.78
+Popularitas                      4.15 +- 0.57   3.85 +- 0.34   5.89 +- 0.38   4.15 +- 0.57   6.92 +- 0.63   8.05 +- 0.62
+Satuan NDCG dan MRR: persen; format rata-rata +- standard error.
+
+=== DIAGNOSTIK (bukan metrik protokol) ===
+Pasangan test dengan item yang ada di train: 3636 dari 4001 (laporan preprocessing: 3636 dari 4001) -> cocok? True
+Plafon realistis (hanya film yang ada di train yang bisa ditebak), rata-rata persen:
+  Recall@1: 35.74
+  Recall@5: 90.37
+  Recall@20: 91.00
+ILUSTRASI kebocoran (query validasi TIDAK dikeluarkan dari datastore, k=90): Recall@20 = 41.99 vs bersih 26.28. Angka bocor tidak valid; ditampilkan hanya untuk menunjukkan mengapa query dikeluarkan.
+
+=== KETERBATASAN ===
+- Hanya 1229 dari 1342 dialog test dipakai (filter K1-K3); tidak sebanding langsung dengan angka paper.
+- Satu split validasi dengan satu seed; tidak ada interval kepercayaan antar-seed.
+- Datastore saat tuning (80%) lebih kecil daripada datastore akhir (100%).
+- Top-N dapat memuat ID ganda untuk film yang sama (K5).
+- Pengaturan tidak boleh diubah setelah hasil test dilihat.

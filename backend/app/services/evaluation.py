@@ -34,6 +34,38 @@ def hit_at_k(ranked, relevant, k):
     return 1.0 if set(ranked[:k]) & set(relevant) else 0.0
 
 
+def ndcg_at_k(ranked, relevant, k):
+    """NDCG binary per query. ID berulang hanya mendapat gain pertama;
+    posisi asli dipertahankan. IDCG memakai seluruh ground truth."""
+    if k < 1:
+        raise ValueError("k harus >= 1")
+    if not relevant:
+        raise ValueError("Himpunan item relevan kosong")
+    relevant = set(relevant)
+    seen = set()
+    dcg = 0.0
+    for position, movie_id in enumerate(ranked[:k], 1):
+        if movie_id in relevant and movie_id not in seen:
+            dcg += 1.0 / math.log2(position + 1)
+        seen.add(movie_id)
+    ideal = sum(1.0 / math.log2(i + 1) for i in range(1, min(k, len(relevant)) + 1))
+    return dcg / ideal
+
+
+def reciprocal_rank_at_k(ranked, relevant, k):
+    """RR per query: 1/posisi relevan pertama di Top-K, atau 0.
+    Rata-rata nilai ini atas semua query adalah MRR@K."""
+    if k < 1:
+        raise ValueError("k harus >= 1")
+    if not relevant:
+        raise ValueError("Himpunan item relevan kosong")
+    relevant = set(relevant)
+    for position, movie_id in enumerate(ranked[:k], 1):
+        if movie_id in relevant:
+            return 1.0 / position
+    return 0.0
+
+
 def ceiling_at_k(num_relevant, k):
     """Recall@K tertinggi yang mungkin untuk satu query: min(K, |relevan|) / |relevan|."""
     if k < 1:
@@ -57,16 +89,18 @@ def mean_se(values):
 
 def evaluate_rankings(rankings, relevants, ks=KS):
     """rankings: list daftar movie_id per query; relevants: list himpunan movie_id per query.
-    Hasil: dict dengan (rata-rata, standard error) untuk recall, hit, dan ceiling per K."""
+    Hasil: dict (rata-rata, standard error) untuk recall, hit, ceiling, ndcg, mrr per K."""
     if len(rankings) != len(relevants):
         raise ValueError("Jumlah peringkat dan jumlah himpunan relevan berbeda")
     if not rankings:
         raise ValueError("Tidak ada query")
-    out = {"n_queries": len(rankings), "recall": {}, "hit": {}, "ceiling": {}}
+    out = {"n_queries": len(rankings), "recall": {}, "hit": {}, "ceiling": {}, "ndcg": {}, "mrr": {}}
     for k in ks:
         out["recall"][k] = mean_se(recall_at_k(r, rel, k) for r, rel in zip(rankings, relevants))
         out["hit"][k] = mean_se(hit_at_k(r, rel, k) for r, rel in zip(rankings, relevants))
         out["ceiling"][k] = mean_se(ceiling_at_k(len(rel), k) for rel in relevants)
+        out["ndcg"][k] = mean_se(ndcg_at_k(r, rel, k) for r, rel in zip(rankings, relevants))
+        out["mrr"][k] = mean_se(reciprocal_rank_at_k(r, rel, k) for r, rel in zip(rankings, relevants))
     return out
 
 
