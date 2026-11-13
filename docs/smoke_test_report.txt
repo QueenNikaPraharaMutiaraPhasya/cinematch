@@ -1,17 +1,17 @@
 Server: http://127.0.0.1:8000 | {'status': 'ok', 'model': 'all-MiniLM-L6-v2', 'datastore_conversations': 9566}
 
 === 1. Query normal dan kasus tepi (struktur hasil) ===
-  'I want a psychological thriller with a plot twist': 32 ms | top_similarity=0.8594 | 3 teratas: Get Out (2017) (13); Seven (1995) (11); Shutter Island (2010) (11)
-  'something like Inception': 18 ms | top_similarity=0.7274 | 3 teratas: The Matrix (1999) (5); Star Wars: Episode VIII – The Last Jedi (2017) (5); Taken (2008) (5)
-  'a feel-good romantic comedy for a rainy evening': 20 ms | top_similarity=0.818 | 3 teratas: 50 First Dates (2004) (15); How to Lose a Guy in 10 Days (2003) (15); 10 Things I Hate About You (1999) (13)
-  'hi': 17 ms | top_similarity=1.0 | 3 teratas: Black Panther (2018) (11); Thor: Ragnarok (2017) (4); Memento (2000) (4)
-  'asdfgh qwerty': 19 ms | top_similarity=0.3152 | 3 teratas: Black Panther (2018) (14); Bridesmaids (2011) (6); Jumanji (2017) (6)
-  'film horor yang menakutkan': 17 ms | top_similarity=0.5443 | 3 teratas: Black Panther (2018) (6); Thor: Ragnarok (2017) (4); Get Out (2017) (4)
-  'I want something fun 😀 with café scenes': 19 ms | top_similarity=0.571 | 3 teratas: 50 First Dates (2004) (13); Pretty Woman (1990) (12); How to Lose a Guy in 10 Days (2003) (10)
-  '???': 18 ms | top_similarity=0.3101 | 3 teratas: It (2017) (18); Get Out (2017) (7); The Shining (1980) (6)
-  'line one\n\n  line two\tend': 18 ms | top_similarity=0.2274 | 3 teratas: Black Panther (2018) (10); It (2017) (7); Bridesmaids (2011) (6)
-  '<script>alert(1)</script>': 20 ms | top_similarity=0.2277 | 3 teratas: It (2017) (29); The Shining (1980) (10); Saw (2004) (9)
-  "'; DROP TABLE movies; --": 22 ms | top_similarity=0.4672 | 3 teratas: The Hangover (2009) (8); Bad Moms (2016) (7); Jumanji (2017) (5)
+  'I want a psychological thriller with a plot twist': 51 ms | top_similarity=0.8594 | 3 teratas: Get Out (2017) (13); Seven (1995) (11); Shutter Island (2010) (11)
+  'something like Inception': 29 ms | top_similarity=0.7274 | 3 teratas: The Matrix (1999) (5); Star Wars: Episode VIII – The Last Jedi (2017) (5); Taken (2008) (5)
+  'a feel-good romantic comedy for a rainy evening': 27 ms | top_similarity=0.818 | 3 teratas: 50 First Dates (2004) (15); How to Lose a Guy in 10 Days (2003) (15); 10 Things I Hate About You (1999) (13)
+  'hi': 23 ms | top_similarity=1.0 | 3 teratas: Black Panther (2018) (11); Thor: Ragnarok (2017) (4); Memento (2000) (4)
+  'asdfgh qwerty': 26 ms | top_similarity=0.3152 | 3 teratas: Black Panther (2018) (14); Bridesmaids (2011) (6); Jumanji (2017) (6)
+  'film horor yang menakutkan': 26 ms | top_similarity=0.5443 | 3 teratas: Black Panther (2018) (6); Thor: Ragnarok (2017) (4); Get Out (2017) (4)
+  'I want something fun 😀 with café scenes': 25 ms | top_similarity=0.571 | 3 teratas: 50 First Dates (2004) (13); Pretty Woman (1990) (12); How to Lose a Guy in 10 Days (2003) (10)
+  '???': 24 ms | top_similarity=0.3101 | 3 teratas: It (2017) (18); Get Out (2017) (7); The Shining (1980) (6)
+  'line one\n\n  line two\tend': 26 ms | top_similarity=0.2274 | 3 teratas: Black Panther (2018) (10); It (2017) (7); Bridesmaids (2011) (6)
+  '<script>alert(1)</script>': 27 ms | top_similarity=0.2277 | 3 teratas: It (2017) (29); The Shining (1980) (10); Saw (2004) (9)
+  "'; DROP TABLE movies; --": 24 ms | top_similarity=0.4672 | 3 teratas: The Hangover (2009) (8); Bad Moms (2016) (7); Jumanji (2017) (5)
 
 === 2. Query kosong ===
   selesai
@@ -26,7 +26,7 @@ Server: http://127.0.0.1:8000 | {'status': 'ok', 'model': 'all-MiniLM-L6-v2', 'd
   selesai
 
 === 6. Konsistensi dan latensi ===
-  Latensi 20 permintaan (ms): median 17, min 15, maks 20
+  Latensi 20 permintaan (ms): median 24, min 21, maks 32
   Diukur di komputer ini (CPU saja), termasuk HTTP lokal dan pengkodean query; bukan klaim umum.
 
 === RINGKASAN: pemeriksaan 211, gagal 0 ===
