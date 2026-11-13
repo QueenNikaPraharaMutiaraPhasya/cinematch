@@ -1,0 +1,23 @@
+Maks jumlah konteks berbeda dalam satu percakapan (harus 1): 1
+Percakapan per split: {'train': 9566, 'test': 1229}
+
+Memuat model all-MiniLM-L6-v2 (CPU)
+max_seq_length model: 256
+
+Mengenkode 9566 konteks train ...
+
+Mengenkode 1229 konteks test ...
+
+=== VALIDASI ===
+train: bentuk (9566, 384), dtype float32, jumlah baris = jumlah percakapan? True
+  nilai NaN/Inf: 0, norma min/maks: 1.0000 / 1.0000
+test: bentuk (1229, 384), dtype float32, jumlah baris = jumlah percakapan? True
+  nilai NaN/Inf: 0, norma min/maks: 1.0000 / 1.0000
+
+Enkode ulang 3 konteks train pertama cocok dengan file tersimpan: True
+
+=== UJI KASAR: tetangga train terdekat untuk konteks test pertama ===
+Konteks test: Hi I am looking for a movie like Super Troopers (2001)
+  #1 sim=0.869 | conv 9757 | Hi. I'm a fan of comedy films. Could you help me find something? Something like Super Troopers (2001)
+  #2 sim=0.727 | conv 7119 | Hi Hi Im looking for an action movie like Predator (1987) or Black Hawk Down (2002) sure
+  #3 sim=0.724 | conv 17640 | Hi. I was hoping you could help me find a movie. I loved We Were Soldiers (2002) The Patriot (2000) and Black Hawk Down (2002)

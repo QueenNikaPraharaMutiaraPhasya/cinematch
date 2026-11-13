@@ -1,0 +1,19 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Data: diunduh dan dibuat ulang lewat langkah di README
+data/raw/
+data/processed/
+data/embeddings/
+
+# Node (frontend punya .gitignore sendiri)
+node_modules/
+dist/
+
+# Editor dan sistem operasi
+.vscode/
+Thumbs.db
+.DS_Store

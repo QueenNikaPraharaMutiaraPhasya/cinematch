@@ -1,0 +1,79 @@
+Model siap. Datastore train: 9566 percakapan | K=10, N=5
+
+=== PANJANG TOKEN (batas model 256) ===
+train: 9566 konteks | token maks 163 | melebihi batas: 0
+test: 1229 konteks | token maks 147 | melebihi batas: 0
+
+=== QUERY: 'I want a psychological thriller with a plot twist, but without too much violence.' ===
+status: ok
+top_similarity (tetangga #1): 0.816
+3 tetangga teratas:
+  #1 sim=0.816 | Hello, looking for a good psychological thriller
+  #2 sim=0.803 | I think I would like a good thriller Something with an awesome never saw it coming plot twist
+  #3 sim=0.782 | Hello! I am looking for a movie in the psychological thriller genre
+Top-5 rekomendasi:
+  1. Shutter Island (2010) | suara 3/10
+  2. Get Out (2017) | suara 2/10
+  3. Seven (1995) | suara 2/10
+  4. Don't Breathe (2016) | suara 2/10
+  5. Split (2017) | suara 2/10
+
+=== QUERY: 'something like Inception' ===
+status: ok
+top_similarity (tetangga #1): 0.727
+3 tetangga teratas:
+  #1 sim=0.727 | Hi can you suggest a good movie simlar to Inception (2010)
+  #2 sim=0.627 | Hi! I am looking for a psychological thriller something that keeps you on the edge of your seat I re
+  #3 sim=0.619 | Hi Any good sci-fi’s? Like Interstellar (2014) Or Apollo 13 (1995) I like inception.
+Top-5 rekomendasi:
+  1. The Matrix Reloaded (2003) | suara 2/10
+  2. Red Sparrow (2018) | suara 2/10
+  3. Fight Club (1999) | suara 1/10
+  4. Source Code (2011) | suara 1/10
+  5. The Matrix (1999) | suara 1/10
+
+=== QUERY: 'a feel-good romantic comedy for a rainy evening' ===
+status: ok
+top_similarity (tetangga #1): 0.818
+3 tetangga teratas:
+  #1 sim=0.818 | Can you suggest a good romantic comedy?
+  #2 sim=0.793 | Hi. I'm looking for a romantic comedy? Any suggestions?
+  #3 sim=0.791 | Can you help me find a romantic comedy?
+Top-5 rekomendasi:
+  1. 50 First Dates (2004) | suara 4/10
+  2. Forgetting Sarah Marshall (2008) | suara 3/10
+  3. Crazy, Stupid, Love (2011) | suara 3/10
+  4. How to Lose a Guy in 10 Days (2003) | suara 2/10
+  5. The Proposal (2009) | suara 2/10
+
+=== QUERY: 'hi' ===
+status: ok
+top_similarity (tetangga #1): 1.000
+3 tetangga teratas:
+  #1 sim=1.000 | hi
+  #2 sim=1.000 | Hi
+  #3 sim=1.000 | Hi
+Top-5 rekomendasi:
+  1. Memento (2000) | suara 2/10
+  2. Inception (2010) | suara 1/10
+  3. Animal House (1978) | suara 1/10
+  4. 50 First Dates (2004) | suara 1/10
+  5. Sausage Party | suara 1/10
+
+=== QUERY: 'asdfgh qwerty' ===
+status: ok
+top_similarity (tetangga #1): 0.315
+3 tetangga teratas:
+  #1 sim=0.315 | Hello Mysteries
+  #2 sim=0.284 | Action
+  #3 sim=0.284 | action
+Top-5 rekomendasi:
+  1. Anchorman | suara 3/10
+  2. When Harry Met Sally... (1989) | suara 2/10
+  3. Knocked Up (2007) | suara 2/10
+  4. Bridesmaids (2011) | suara 2/10
+  5. Gone Girl (2014) | suara 1/10
+
+=== QUERY: '' ===
+status: empty_query
+pesan: Query kosong. Tulis preferensi film Anda dalam bahasa Inggris.

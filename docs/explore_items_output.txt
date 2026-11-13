@@ -1,0 +1,99 @@
+
+=== LABEL suggested: TRAIN (10006 dialog) ===
+suggested=1 sama antara initiatorQuestions dan respondentQuestions: 7635 dari 10006
+Kunci initiatorQuestions berbeda dari movieMentions: 234
+Jumlah item suggested=1 per dialog (initiatorQuestions):
+count    10006.00
+mean         3.57
+std          1.35
+min          0.00
+25%          3.00
+50%          4.00
+75%          4.00
+max         19.00
+Dialog dengan 0 item suggested: 142
+
+=== LABEL suggested: TEST (1342 dialog) ===
+suggested=1 sama antara initiatorQuestions dan respondentQuestions: 1013 dari 1342
+Kunci initiatorQuestions berbeda dari movieMentions: 36
+Jumlah item suggested=1 per dialog (initiatorQuestions):
+count    1342.00
+mean        3.37
+std         1.39
+min         0.00
+25%         3.00
+50%         3.00
+75%         4.00
+max        11.00
+Dialog dengan 0 item suggested: 32
+
+=== KONTEKS seeker sebelum rekomendasi pertama: TRAIN ===
+Dialog dengan konteks kosong: 210
+Dialog punya item suggested tapi tidak ada pesan yang menyebutnya: 0
+Panjang konteks (jumlah kata):
+count    10006.0
+mean        17.7
+std         13.5
+min          0.0
+25%          9.0
+50%         15.0
+75%         23.0
+max        270.0
+
+=== KONTEKS seeker sebelum rekomendasi pertama: TEST ===
+Dialog dengan konteks kosong: 58
+Dialog punya item suggested tapi tidak ada pesan yang menyebutnya: 0
+Panjang konteks (jumlah kata):
+count    1342.0
+mean       18.2
+std        14.6
+min         0.0
+25%         9.0
+50%        15.0
+75%        24.0
+max       164.0
+
+=== CONTOH konteks dan item (train) ===
+
+conv 391
+  konteks: Hi there, how are you? I'm looking for movie recommendations I like animations like The Triplets of Belleville (2003) and Waking Life (2001) I also enjoy Mary and Max (2009) Anything artistic
+  item suggested: ['The Boss Baby (2017)', 'Final Fantasy: The Spirits Within (2001)']
+
+conv 397
+  konteks: Avatar  It is a nice movie. What say? Avatar  (2009) Was a marvelous 3D experience personally for me No. I am not. I like sci-fi movies. Have you watched The Martian  (2015) My another favorite sci-fi movies are Contact  (2009) and Donnie Darko (2001)
+  item suggested: ['Indiana Jones and the Kingdom of the Crystal Skull (2008)', 'Star Wars']
+
+conv 407
+  konteks: Hello What movie would you suggest to watch
+  item suggested: ['Annabelle  (2014)', 'Girls Trip (2017)']
+
+=== JUDUL KEMBAR (judul sama tanpa tahun, ID berbeda, dalam satu dialog) ===
+Jumlah kelompok per kategori: {'salah satu tanpa tahun': 97, 'tahun berbeda': 578, 'tahun sama (atau keduanya tanpa tahun)': 4}
+
+Contoh kategori 'salah satu tanpa tahun':
+  conv 397: 90950='Avatar  (2009)' (CSV nbMentions=169) | 163606='Avatar ' (CSV nbMentions=1)
+  conv 1316: 132669='Just Married' (CSV nbMentions=3) | 150305='Just Married  (2007)' (CSV nbMentions=12)
+  conv 1428: 99276='Star Wars  (1977)' (CSV nbMentions=163) | 204292='Star Wars' (CSV nbMentions=141)
+
+Contoh kategori 'tahun berbeda':
+  conv 418: 201231='The Wolf of Wall Street  (1929)' (CSV nbMentions=2) | 178950='The Wolf of Wall Street  (2013)' (CSV nbMentions=50)
+  conv 487: 77161='A Nightmare on Elm Street (1984)' (CSV nbMentions=164) | 119295='A Nightmare on Elm Street  (2010)' (CSV nbMentions=25)
+  conv 586: 93683='The Blob (1958)' (CSV nbMentions=3) | 93402='The Blob  (1988)' (CSV nbMentions=3)
+
+Contoh kategori 'tahun sama (atau keduanya tanpa tahun)':
+  conv 10446: 122411='The Bridge  (2006)' (CSV nbMentions=1) | 191956='The Bridge  (2006)' (CSV nbMentions=1)
+  conv 11038: 164798='Burlesque  (2010)' (CSV nbMentions=1) | 99066='Burlesque  (2010)' (CSV nbMentions=3)
+  conv 13874: 104784='Tinker Bell ' (CSV nbMentions=1) | 183951='Tinker Bell ' (CSV nbMentions=1)
+
+=== ANOMALI ===
+movie_id 50 di CSV:
+Empty DataFrame
+Columns: [movieId, movieName, nbMentions]
+Index: []
+
+=== JANGKAUAN item test terhadap data train ===
+Pasangan (dialog test, item suggested): 4518
+  item tidak pernah muncul di train sama sekali: 355
+  item muncul di train tapi tidak pernah sebagai saran: 63
+Dialog test dengan >=1 item suggested: 1310
+  di antaranya punya >=1 item yang pernah disarankan di train: 1295

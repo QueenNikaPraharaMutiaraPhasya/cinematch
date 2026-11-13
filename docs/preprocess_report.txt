@@ -1,0 +1,90 @@
+Tipe conversationId di data mentah: str
+
+=== TRAIN ===
+Dialog mentah: 10006
+Dialog dibuang: 440
+  - tanpa item saran valid: 272
+  - konteks kosong: 167
+  - movieMentions bukan dict atau kosong: 1
+Dialog dipakai: 9566
+Cek: mentah = dibuang + dipakai -> True
+Baris pasangan (conversation, item): 33246
+Film unik sebagai item: 5272
+Catatan - token @ID tak terselesaikan di konteks: 0
+Catatan - pasangan: judul item = judul film di konteks (ID beda): 41
+  contoh: conv 1428: item 'Star Wars (1977)'
+  contoh: conv 2295: item 'Jumanji (1995)'
+  contoh: conv 2466: item 'Jumanji (1995)'
+  contoh: conv 2510: item 'Planet of the Apes (2001)'
+  contoh: conv 2888: item 'It (1966)'
+Item per dialog:
+count    9566.00
+mean        3.48
+std         1.27
+min         1.00
+25%         3.00
+50%         3.00
+75%         4.00
+max        19.00
+Panjang konteks (kata):
+count    9566.0
+mean       17.9
+std        11.2
+min         1.0
+25%        10.0
+50%        15.0
+75%        23.0
+max       111.0
+
+=== TEST ===
+Dialog mentah: 1342
+Dialog dibuang: 113
+  - tanpa item saran valid: 61
+  - konteks kosong: 52
+Dialog dipakai: 1229
+Cek: mentah = dibuang + dipakai -> True
+Baris pasangan (conversation, item): 4001
+Film unik sebagai item: 1482
+Catatan - token @ID tak terselesaikan di konteks: 0
+Catatan - pasangan: judul item = judul film di konteks (ID beda): 8
+  contoh: conv 20968: item 'Click (2010)'
+  contoh: conv 21331: item 'The Notebook (2004)'
+  contoh: conv 21671: item 'It (1990)'
+  contoh: conv 22354: item 'It (1990)'
+  contoh: conv 22416: item 'It (1990)'
+Item per dialog:
+count    1229.00
+mean        3.26
+std         1.23
+min         1.00
+25%         2.00
+50%         3.00
+75%         4.00
+max        10.00
+Panjang konteks (kata):
+count    1229.0
+mean       18.7
+std        12.7
+min         1.0
+25%        11.0
+50%        16.0
+75%        24.0
+max       114.0
+
+=== VALIDASI AKHIR ===
+Pasangan duplikat (split, conversation_id, movie_id): 0
+Konteks kosong: 0
+Judul film kosong: 0
+conversation_id yang muncul di train DAN test: 0
+Pasangan test dengan film yang juga item di train: 3636 dari 4001 (batas atas teoretis, bukan hasil)
+
+=== PEMERIKSAAN ANOMALI (train) ===
+conv 1973: dibuang: movieMentions bukan dict atau kosong
+conv 1382: dipakai: 1 item
+conv 4186: dibuang: tanpa item saran valid
+
+=== CONTOH 3 BARIS PERTAMA ===
+split conversation_id                                                                          context movie_id                              movie_title
+train             391 Hi there, how are you? I'm looking for movie recommendations I like animations l   165710                     The Boss Baby (2017)
+train             391 Hi there, how are you? I'm looking for movie recommendations I like animations l   203371 Final Fantasy: The Spirits Within (2001)
+train             415            Hi! I'm supposed to get suggestions from you for what movies to watch   119144                      Wonder Woman (2017)
