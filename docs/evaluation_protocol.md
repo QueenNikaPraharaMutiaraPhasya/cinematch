@@ -3,6 +3,53 @@
 Status: rancangan v1, disepakati SEBELUM kode evaluasi ditulis.
 Ini bukan replikasi eksperimen paper.
 
+## Tambahan evaluasi ranking kelompok
+
+NDCG@K dan MRR@K adalah metrik tambahan kelompok kami, **bukan metrik asli
+paper NBCRS**. Tambahan ini disepakati setelah hasil test eksperimen lama
+diketahui. Hasilnya merupakan evaluasi tambahan, bukan eksperimen test baru
+yang belum pernah diamati. K12-K19 dan pemilihan k berdasarkan Recall@20
+validasi tetap berlaku; NDCG/MRR maupun data test tidak dipakai untuk tuning.
+
+- Ground truth R tetap himpunan movie_id K12, dapat berisi beberapa film.
+  Item relevan yang tidak ada di datastore tetap termasuk R; tidak ada alias judul.
+- Binary relevance: gain 1 untuk ID relevan pada kemunculan pertamanya, 0 selain itu.
+  ID duplikat tidak mendapat gain tambahan dan tidak dihapus dari ranking:
+  posisi berikutnya tetap posisi asli (posisi dimulai dari 1).
+- DCG@K = jumlah gain_i / log2(i+1) pada posisi 1 sampai min(K, panjang ranking).
+- IDCG@K = jumlah 1 / log2(i+1) pada posisi 1 sampai min(K, |R|).
+  Penyebut tidak diperkecil mengikuti panjang ranking atau banyaknya target yang ditemukan.
+- NDCG@K = DCG@K / IDCG@K. Contoh R={A,B}, ranking=[A,X,B], K=3:
+  NDCG = 1.5 / (1 + 1/log2(3)) = sekitar 0.91972.
+- RR@K = 1/r untuk posisi film relevan pertama r di Top-K, atau 0 jika tidak ada.
+  MRR@K adalah rata-rata RR atas seluruh query, termasuk query dengan nilai nol.
+- K tetap {1,5,20}. Kedua metrik dirata-rata per dialog (macro), dengan standard
+  error sampel ddof=1 dibagi akar n melalui mean_se(), sama seperti Recall.
+  Satu query memiliki SE=0. Nilai fungsi 0-1; laporan/CSV menyajikan persen.
+- Ranking kosong bernilai 0 untuk R tidak kosong. Ranking pendek tidak ditambah
+  item. R kosong atau K<1 menghasilkan ValueError, konsisten dengan Recall.
+- Skrip yang sama mengevaluasi ranking NB dan popularitas yang sudah dihitung.
+  Recall, Hit, ceiling, split 80/20, seed 42, grid k, dan panjang daftar 20 tetap.
+
+Jalankan dari root: `.\.venv\Scripts\python.exe scripts\run_evaluation.py`.
+Hasil tambahan ditulis ke `docs/evaluation_report_ranking.txt` dan
+`docs/evaluation_results_ranking.csv`. Laporan lama `evaluation_report.txt`
+dan `evaluation_results.csv` tidak ditimpa. CSV tetap memakai kolom lama,
+dengan tambahan nilai metric `ndcg` dan `mrr`. Tabel ranking dipisahkan dari
+tabel metrik lama; baris plafon tetap hanya untuk Recall.
+
+### Verifikasi terhadap arsip eksperimen
+
+Pada eksekusi tambahan dengan embedding lokal yang tersedia, semua nilai metrik
+test lama cocok dengan CSV arsip (presisi empat desimal persen). Empat baris
+validasi berbeda sedikit: Recall@20/Hit@20 untuk k=60 dan Recall@1/Hit@1 untuk
+k=90. Nilai mean lama -> baru berturut-turut adalah 25.4501 -> 25.4631,
+54.3649 -> 54.4171, 3.3590 -> 3.3655, dan 11.1866 -> 11.2389 persen.
+Kode evaluasi lama dari Git, dijalankan pada ranking dari embedding lokal saat ini,
+menghasilkan mean dan standard error yang sama dengan baris baru tersebut.
+Dengan demikian, perbedaan ini bukan akibat rumus metrik tambahan; penyebab
+perbedaan terhadap artefak eksperimen historis belum ditentukan. k terpilih tetap 90.
+
 ## Fakta dari paper (teks yang dilampirkan)
 - Metrik: Recall@k, k dalam {1, 5, 20}; hasil dilaporkan dengan standard error.
 - 20% data training disisihkan untuk validasi; split test mengikuti penelitian lain ([11] di paper).
