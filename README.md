@@ -45,11 +45,11 @@ Catatan membaca hasil:
 - Recall pada validasi lebih tinggi daripada test (26,28 vs 19,35 untuk Recall@20). Dugaan penyebabnya belum diuji; angka test adalah hasil resmi.
 - **Tidak sebanding langsung dengan paper** (definisi item dan konteks, jumlah dialog, dan protokol berbeda). Jangan menyimpulkan hasil ini lebih baik atau lebih buruk dari paper.
 - Detail lengkap (semua nilai k, Hit@1/5, diagnostik): `docs/evaluation_report.txt` dan `docs/evaluation_results.csv`.
-- Waktu respons API diukur di satu komputer (CPU saja): median 17 ms untuk satu query yang diulang 20 kali, termasuk HTTP lokal. Bukan klaim umum (`docs/smoke_test_report.txt`).
+- Waktu respons API diukur di satu komputer (CPU saja): median 24 ms untuk satu query yang diulang 20 kali, termasuk HTTP lokal. Bukan klaim umum (`docs/smoke_test_report.txt`).
 
 ## Persyaratan
 
-Diuji di **Windows**, Python 3.14.5, Node.js v24.16.0, npm 11.13.0. Versi library Python terkunci di `requirements.txt`. Tidak membutuhkan GPU. Vite membutuhkan Node.js 20.19+ atau 22.12+ (panduan resmi Vite).
+Diuji di **Windows** dengan Python 3.14.6 dan Node.js v24.19.0. Versi library Python terkunci di `requirements.txt`. Tidak membutuhkan GPU. Vite membutuhkan Node.js 20.19+ atau 22.12+ (panduan resmi Vite). Beberapa paket Python memakai versi yang berhasil dimuat pada Windows dengan Smart App Control aktif; ini tidak menjamin semua komputer menerima binary yang sama.
 
 ## Menjalankan dari nol
 
@@ -59,9 +59,8 @@ Semua perintah di PowerShell, dari folder proyek (`cinematch`).
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.14.1+cpu"
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 **2. Unduh data ReDial** (CC BY 4.0)
@@ -75,8 +74,8 @@ Expand-Archive -Path data\raw\redial_dataset.zip -DestinationPath data\raw\redia
 **3. Preprocessing dan embedding**
 
 ```powershell
-python scripts\preprocess_redial.py
-python scripts\build_embeddings.py
+.\.venv\Scripts\python.exe scripts\preprocess_redial.py
+.\.venv\Scripts\python.exe scripts\build_embeddings.py
 ```
 
 Model embedding diunduh otomatis saat pertama kali dipakai.
@@ -84,25 +83,25 @@ Model embedding diunduh otomatis saat pertama kali dipakai.
 **4. Tes**
 
 ```powershell
-python -m pytest -v
+.\.venv\Scripts\python.exe -m pytest -v
 ```
 
-Jalankan dari folder proyek (bukan dari `frontend`), karena pengaturan ada di `pytest.ini`. Hasil yang diharapkan: **69 passed**.
+Jalankan dari folder proyek (bukan dari `frontend`), karena pengaturan ada di `pytest.ini`. Hasil yang sudah diverifikasi setelah penambahan tes NDCG/MRR: **96 passed**.
 
 **5. Evaluasi (opsional, butuh beberapa menit)**
 
 ```powershell
-python scripts\run_evaluation.py
+.\.venv\Scripts\python.exe scripts\run_evaluation.py
 ```
 
-Hasil: `docs/evaluation_report.txt` dan `docs/evaluation_results.csv`.
+Hasil baru: `docs/evaluation_report_ranking.txt` dan `docs/evaluation_results_ranking.csv`, termasuk NDCG/MRR sebagai metrik tambahan kelompok. Arsip eksperimen lama `docs/evaluation_report.txt` dan `docs/evaluation_results.csv` tidak ditimpa.
 
 **6. Menjalankan aplikasi** (dua jendela PowerShell)
 
-Jendela 1, backend (folder proyek, `.venv` aktif):
+Jendela 1, backend (folder proyek):
 
 ```powershell
-python -m uvicorn backend.app.main:app --port 8000
+.\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --port 8000
 ```
 
 Tunggu pesan `Application startup complete.`. Cek di <http://127.0.0.1:8000/health> atau dokumentasi API di <http://127.0.0.1:8000/docs>.
@@ -111,8 +110,8 @@ Jendela 2, frontend:
 
 ```powershell
 cd frontend
-npm install
-npm run dev
+npm.cmd ci
+npm.cmd run dev
 ```
 
 Buka <http://localhost:5173> (harus persis alamat ini; backend hanya mengizinkan origin `localhost` dan `127.0.0.1` pada port 5173 dan 3000). Alamat backend dapat diganti dengan variabel lingkungan `VITE_API_URL`.
@@ -120,7 +119,7 @@ Buka <http://localhost:5173> (harus persis alamat ini; backend hanya mengizinkan
 **7. Smoke test end-to-end (opsional; backend harus menyala)**
 
 ```powershell
-python scripts\smoke_test_api.py
+.\.venv\Scripts\python.exe scripts\smoke_test_api.py
 ```
 
 ## Penggunaan API
