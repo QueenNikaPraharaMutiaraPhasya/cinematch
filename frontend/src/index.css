@@ -1,5 +1,5 @@
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
   --bg: #f6f7fb;
   --surface: #ffffff;
   --text: #1c2030;
@@ -8,11 +8,32 @@
   --accent: #5b4bdb;
   --accent-dark: #4638b8;
   --accent-soft: #eeebff;
+  --btn: #5b4bdb;
+  --btn-hover: #4638b8;
+  --chip-hover: #e2ddff;
   --danger: #a12626;
   --danger-bg: #fdecec;
+  --danger-border: #f3c1c1;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+  --bg: #080D1B;
+  --panel: #101A30;
+  --panel2: #172440;
+  --line: #293B5C;
+
+  --text: #E8EEFF;
+  --muted: #9BAECC;
+
+  --green: #78A9FF;
+  --green2: #3978D8;
+  --green-dim: #203D70;
+
+  --red: #ff7777;
+}}
 
 *,
 *::before,
