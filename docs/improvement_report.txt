@@ -1,0 +1,44 @@
+PERBAIKAN NB CINEMATCH (NB murni, tanpa MB; dataset ReDial; bukan replikasi paper)
+Pasca-hoc: protokol lama sudah melihat test. Seleksi di sini HANYA memakai validasi;
+test dievaluasi satu kali untuk konfigurasi terpilih. Evaluasi ini harus dilaporkan sebagai eksperimen lanjutan.
+Python 3.14.5 | numpy 2.5.4 | seed 42 | N = 20
+Encoder: ['all-MiniLM-L6-v2', 'BAAI/bge-small-en-v1.5'] | grid k = (5, 10, 30, 60, 90, 120, 150, 200, 300) | skema = [('uniform', 1.0), ('power', 2.0), ('power', 4.0), ('power', 8.0), ('softmax', 0.1), ('softmax', 0.05), ('softmax', 0.02)]
+Train 9566 -> datastore sementara 7653, query validasi 1913; test 1229
+Meng-encode 9566 konteks train dengan BAAI/bge-small-en-v1.5 ...
+Meng-encode 1229 konteks test dengan BAAI/bge-small-en-v1.5 ...
+
+=== TAHAP 1: GRID PADA VALIDASI (seleksi: Recall@20) ===
+Pemeriksaan jalur cepat vs nb.recommend (50 query): cocok
+
+10 konfigurasi terbaik pada validasi:
+Konfigurasi                                                      Recall@1       Recall@5      Recall@20        NDCG@20
+all-MiniLM-L6-v2 | power(8) | k=300                          4.05 +- 0.27  12.37 +- 0.47  27.75 +- 0.69  18.20 +- 0.51
+all-MiniLM-L6-v2 | power(8) | k=200                          3.99 +- 0.26  12.20 +- 0.47  27.50 +- 0.68  18.06 +- 0.50
+all-MiniLM-L6-v2 | power(8) | k=150                          3.89 +- 0.26  12.24 +- 0.47  27.37 +- 0.68  17.92 +- 0.50
+all-MiniLM-L6-v2 | softmax(0.1) | k=300                      3.90 +- 0.26  12.26 +- 0.47  27.26 +- 0.68  17.84 +- 0.50
+all-MiniLM-L6-v2 | softmax(0.1) | k=150                      3.84 +- 0.26  12.24 +- 0.47  27.21 +- 0.68  17.80 +- 0.50
+BAAI/bge-small-en-v1.5 | power(8) | k=150                    3.88 +- 0.25  12.57 +- 0.47  27.20 +- 0.68  17.91 +- 0.50
+all-MiniLM-L6-v2 | power(8) | k=120                          3.93 +- 0.26  12.06 +- 0.47  27.17 +- 0.68  17.82 +- 0.50
+BAAI/bge-small-en-v1.5 | softmax(0.1) | k=150                3.85 +- 0.25  12.53 +- 0.47  27.17 +- 0.68  17.88 +- 0.50
+all-MiniLM-L6-v2 | softmax(0.1) | k=120                      3.82 +- 0.26  11.90 +- 0.46  27.16 +- 0.68  17.73 +- 0.50
+all-MiniLM-L6-v2 | softmax(0.1) | k=200                      3.95 +- 0.26  12.02 +- 0.46  27.11 +- 0.68  17.83 +- 0.50
+
+Baseline validasi all-MiniLM-L6-v2 | w=1 | k=90: Recall@20 =  26.28 +- 0.68
+Terpilih (Recall@20 validasi tertinggi): all-MiniLM-L6-v2 | power(8) | k=300
+
+=== TAHAP 2: TEST (satu kali), datastore = seluruh train ===
+baseline  all-MiniLM-L6-v2 | w=1 | k=90
+          Recall@1   2.40 +- 0.28 | Recall@5   8.64 +- 0.52 | Recall@20  19.35 +- 0.77 | NDCG@20  12.01 +- 0.53 | MRR@20  14.72 +- 0.78
+terpilih  all-MiniLM-L6-v2 | power(8) | k=300
+          Recall@1   2.47 +- 0.28 | Recall@5   8.44 +- 0.52 | Recall@20  19.44 +- 0.77 | NDCG@20  12.07 +- 0.53 | MRR@20  14.88 +- 0.79
+
+Selisih berpasangan terpilih - baseline per dialog (poin persen; rata-rata +- standard error):
+  Recall@1: +0.07 +- 0.17  (dalam derau)
+  Recall@5: -0.20 +- 0.34  (dalam derau)
+  Recall@20: +0.09 +- 0.41  (dalam derau)
+
+=== KETERBATASAN ===
+- Test sudah pernah dilihat pada protokol lama; ini eksperimen lanjutan, bukan hasil murni.
+- Banyak konfigurasi dicoba pada satu split validasi dan satu seed: ada risiko overfit ke validasi.
+- Jika encoder selain all-MiniLM-L6-v2 terpilih, ubah MODEL_NAME di recommender.py dan buat ulang embedding train.
+- Angka tidak sebanding langsung dengan paper (unit sampel dan protokol berbeda).
