@@ -36,6 +36,7 @@ class Recommendation:
     votes: int
     sim_sum: float
     supporters: list = field(default_factory=list)  # list[(conversation_id, similarity)]
+    score: float = 0.0                              # jumlah bobot w_i; skema "uniform": sama dengan votes
 
 
 def load_data(split="train", processed_dir="data/processed", emb_dir="data/embeddings"):
@@ -97,23 +98,54 @@ def find_neighbors(query_emb, data, k):
     ]
 
 
-def vote(neighbors, data):
-    """Skor item = jumlah neighbor yang memuat item (w_i = 1).
+def neighbor_weights(sims, scheme="uniform", param=1.0):
+    """Bobot w_i tiap tetangga pada Persamaan 1 NBCRS (score(v|q) = sum w_i * 1(v_i = v)).
+    - "uniform": w_i = 1 (pengaturan paper; perilaku asli prototype)
+    - "power":   w_i = max(sim, 0) ** param   (param > 1 mempertajam tetangga terdekat)
+    - "softmax": w_i = exp((sim - sim_max) / param)  (param = temperatur; kecil = tajam)
+    Tetap NB murni: tanpa pelatihan, hanya mengubah cara tetangga ditimbang."""
+    sims = np.asarray(sims, dtype=np.float64)
+    if scheme == "uniform":
+        return np.ones_like(sims)
+    if scheme == "power":
+        return np.clip(sims, 0.0, None) ** param
+    if scheme == "softmax":
+        if param <= 0:
+            raise ValueError("temperatur harus > 0")
+        return np.exp((sims - sims.max()) / param)
+    raise ValueError(f"skema bobot tidak dikenal: {scheme}")
+
+
+def aggregate(rows, sims, data, scheme="uniform", param=1.0, with_supporters=False):
+    """Inti voting: rows = indeks baris tetangga, sims = similarity-nya (urut menurun).
     Seri: jumlah similarity tetangga pendukung, lalu movie_id (keputusan prototype K9)."""
+    weights = neighbor_weights(sims, scheme, param)
     table = {}
-    for nb in neighbors:
-        for movie_id, title in data.items[nb.row]:
+    for row, sim, w in zip(rows, sims, weights):
+        row, sim = int(row), float(sim)
+        for movie_id, title in data.items[row]:
             rec = table.get(movie_id)
             if rec is None:
                 rec = table[movie_id] = Recommendation(movie_id, title, 0, 0.0)
             rec.votes += 1
-            rec.sim_sum += nb.similarity
-            rec.supporters.append((nb.conversation_id, nb.similarity))
-    return sorted(table.values(), key=lambda r: (-r.votes, -r.sim_sum, r.movie_id))
+            rec.sim_sum += sim
+            rec.score += float(w)
+            if with_supporters:
+                rec.supporters.append((data.conv_ids[row], sim))
+    return sorted(table.values(), key=lambda r: (-r.score, -r.sim_sum, r.movie_id))
 
 
-def recommend(query_emb, data, k=10, n=10):
+def vote(neighbors, data, scheme="uniform", param=1.0):
+    """Skor item = jumlah bobot tetangga yang memuat item. Default w_i = 1 (jumlah neighbor)."""
+    return aggregate(
+        [nb.row for nb in neighbors],
+        [nb.similarity for nb in neighbors],
+        data, scheme, param, with_supporters=True,
+    )
+
+
+def recommend(query_emb, data, k=10, n=10, scheme="uniform", param=1.0):
     """Mengembalikan (daftar tetangga, Top-N rekomendasi)."""
     neighbors = find_neighbors(query_emb, data, k)
-    ranked = vote(neighbors, data)
+    ranked = vote(neighbors, data, scheme, param)
     return neighbors, ranked[:n]

@@ -141,10 +141,11 @@ def subset(data, rows):
     )
 
 
-def rank_nb(query_embs, datastore, k, n=N_LIST):
-    """Peringkat NB (daftar movie_id) untuk tiap embedding query, memakai nb.recommend."""
+def rank_nb(query_embs, datastore, k, n=N_LIST, scheme="uniform", param=1.0):
+    """Peringkat NB (daftar movie_id) untuk tiap embedding query, memakai nb.recommend.
+    scheme/param: skema bobot tetangga (default w_i = 1, sama seperti sebelumnya)."""
     rankings = []
     for q in query_embs:
-        _, recs = recommend(q, datastore, k=k, n=n)
+        _, recs = recommend(q, datastore, k=k, n=n, scheme=scheme, param=param)
         rankings.append([r.movie_id for r in recs])
     return rankings
